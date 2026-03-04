@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cierre semanal</title>
+
+  <!-- DataTables + jQuery (CDN) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <link  href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css" rel="stylesheet"/>
+  <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background:#0f1115; color:#e8eaf0; margin:0; padding:24px; }
+    .wrap { max-width:1100px; margin:0 auto; }
+    h1 { margin:0 0 8px; font-size:22px; }
+    .meta { color:#a7adbb; margin:0 0 18px; }
+    .card { background:#131620; border:1px solid #242a36; border-radius:14px; padding:14px; }
+
+    /* Dark */
+    table.dataTable { color:#e8eaf0; }
+    table.dataTable thead th { background:#111420; color:#d7dbe6; }
+    table.dataTable tbody tr { background:#131620; }
+    table.dataTable tbody tr:hover { background:#141a27; }
+
+    .dt-container .dt-length, .dt-container .dt-search, .dt-container .dt-info, .dt-container .dt-paging { color:#a7adbb; }
+    .dt-container input, .dt-container select { background:#171a21; color:#e8eaf0; border:1px solid #2a2f3a; border-radius:10px; padding:8px 10px; }
+
+    .badge { display:inline-block; padding:4px 8px; border-radius:999px; background:#1b2030; border:1px solid #2a3142; color:#cfd5e6; font-size:12px; margin-left:8px; }
+    .footer { color:#9aa2b2; margin-top:14px; font-size:12px; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <h1>📊 Cierre semanal <span class="badge" id="count"></span></h1>
+    <p class="meta">Ordená por columnas • Usá el buscador para filtrar por nombre</p>
+
+    <div class="card">
+      <table id="report" class="display" style="width:100%">
+        <thead>
+          <tr>
+            <th>Habbo user</th>
+            <th>Horas (HH:MM)</th>
+            <th>Actividades</th>
+            <th>Puntos</th>
+            <th>Publicidades</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div class="footer">
+        * Necesita internet para cargar DataTables (CDN).
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 🚀 El bot reemplaza este placeholder por el JSON real
+    const DATA = [{"habbo_user":"cielo-1192","horas":"00:00","horas_min":0,"actividades":0,"puntos":0,"publicidades":0},{"habbo_user":"pepito","horas":"00:00","horas_min":0,"actividades":0,"puntos":0,"publicidades":0}];
+
+    const tbody = document.querySelector("#report tbody");
+    for (const r of DATA) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${escapeHtml(r.habbo_user)}</td>
+        <td data-order="${r.horas_min}">${escapeHtml(r.horas)}</td>
+        <td>${Number(r.actividades)}</td>
+        <td>${Number(r.puntos)}</td>
+        <td>${Number(r.publicidades)}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    const dt = new DataTable('#report', {
+      pageLength: 25,
+      lengthMenu: [10, 25, 50, 100],
+      order: [[0, 'asc']],
+      columnDefs: [{ targets: [2,3,4], className: 'dt-body-right' }],
+      language: {
+        search: "Buscar:",
+        lengthMenu: "Mostrar _MENU_",
+        info: "Mostrando _START_ a _END_ de _TOTAL_",
+        infoEmpty: "Sin resultados",
+        zeroRecords: "No hay resultados",
+        paginate: { first: "Primero", last: "Último", next: "Siguiente", previous: "Anterior" }
+      }
+    });
+
+    document.getElementById("count").textContent = `${DATA.length} usuarios`;
+
+    function escapeHtml(s) {
+      return String(s ?? "").replace(/[&<>"']/g, m => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+  </script>
+</body>
+</html>
